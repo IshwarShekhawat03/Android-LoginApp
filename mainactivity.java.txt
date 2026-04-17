@@ -1,122 +1,68 @@
-package com.example.spinner_app;
+package com.example.login_app;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+import android.util.Patterns;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.spinner_app.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
+    EditText etEmail, etPassword;
+    Button btnLogin;
+
+    // Dummy credentials
+    private final String validEmail = "admin@gmail.com";
+    private final String validPassword = "1234";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_main);
 
-        setSupportActionBar(binding.toolbar);
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
+        btnLogin = findViewById(R.id.btnLogin);
 
-        setupSpinners();
-
-        binding.btnSubmit.setOnClickListener(v -> submitDetails());
-        binding.btnViewHistory.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
-            startActivity(intent);
-        });
+        btnLogin.setOnClickListener(v -> loginUser());
     }
 
-    private void setupSpinners() {
-        setupSpinner(binding.spinnerCity, R.array.cities);
-        setupSpinner(binding.spinnerCourse, R.array.courses);
-        setupSpinner(binding.spinnerBranch, R.array.branches);
-        setupSpinner(binding.spinnerYear, R.array.years);
-        setupSpinner(binding.spinnerSemester, R.array.semesters);
-        setupSpinner(binding.spinnerSection, R.array.sections);
-        setupSpinner(binding.spinnerSpecialization, R.array.specializations);
-        setupSpinner(binding.spinnerCollegeType, R.array.college_types);
-        setupSpinner(binding.spinnerStudyMode, R.array.study_modes);
-        setupSpinner(binding.spinnerHostel, R.array.hostel_requirements);
-    }
+    private void loginUser() {
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
 
-    private void setupSpinner(Spinner spinner, int arrayResId) {
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                arrayResId, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-    }
-
-    private void submitDetails() {
-        String name = binding.etName.getText().toString().trim();
-        
-        if (name.isEmpty()) {
-            binding.tilName.setError("Name is required");
+        // Validation
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Enter valid email", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Authentication
+        if (email.equals(validEmail) && password.equals(validPassword)) {
+            Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(MainActivity.this, HomeActivity.class));
         } else {
-            binding.tilName.setError(null);
+            Toast.makeText(this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
         }
-
-        if (!validateSelections()) {
-            Toast.makeText(this, "Please select all fields", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        StudentEntry entry = new StudentEntry(
-                name,
-                binding.spinnerCity.getSelectedItem().toString(),
-                binding.spinnerCourse.getSelectedItem().toString(),
-                binding.spinnerBranch.getSelectedItem().toString(),
-                binding.spinnerYear.getSelectedItem().toString(),
-                binding.spinnerSemester.getSelectedItem().toString(),
-                binding.spinnerSection.getSelectedItem().toString(),
-                binding.spinnerSpecialization.getSelectedItem().toString(),
-                binding.spinnerCollegeType.getSelectedItem().toString(),
-                binding.spinnerStudyMode.getSelectedItem().toString(),
-                binding.spinnerHostel.getSelectedItem().toString()
-        );
-
-        // Add to history
-        HistoryActivity.historyList.add(entry);
-
-        binding.tvSummary.setText(entry.getSummary());
-        binding.cardSummary.setVisibility(View.VISIBLE);
-
-        Toast.makeText(this, "Details Submitted Successfully", Toast.LENGTH_SHORT).show();
-        
-        // Clear fields for next entry
-        clearFields();
     }
+}
 
-    private void clearFields() {
-        binding.etName.setText("");
-        binding.spinnerCity.setSelection(0);
-        binding.spinnerCourse.setSelection(0);
-        binding.spinnerBranch.setSelection(0);
-        binding.spinnerYear.setSelection(0);
-        binding.spinnerSemester.setSelection(0);
-        binding.spinnerSection.setSelection(0);
-        binding.spinnerSpecialization.setSelection(0);
-        binding.spinnerCollegeType.setSelection(0);
-        binding.spinnerStudyMode.setSelection(0);
-        binding.spinnerHostel.setSelection(0);
-    }
+package com.example.login_app;
 
-    private boolean validateSelections() {
-        return binding.spinnerCity.getSelectedItemPosition() > 0 &&
-                binding.spinnerCourse.getSelectedItemPosition() > 0 &&
-                binding.spinnerBranch.getSelectedItemPosition() > 0 &&
-                binding.spinnerYear.getSelectedItemPosition() > 0 &&
-                binding.spinnerSemester.getSelectedItemPosition() > 0 &&
-                binding.spinnerSection.getSelectedItemPosition() > 0 &&
-                binding.spinnerSpecialization.getSelectedItemPosition() > 0 &&
-                binding.spinnerCollegeType.getSelectedItemPosition() > 0 &&
-                binding.spinnerStudyMode.getSelectedItemPosition() > 0 &&
-                binding.spinnerHostel.getSelectedItemPosition() > 0;
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class HomeActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home);
     }
 }
